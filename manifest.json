@@ -1,9 +1,9 @@
 {
   "name": "吉力咖啡烘焙生管系統",
   "short_name": "吉力生管",
-  "id": "./",
-  "start_url": "./",
-  "scope": "./",
+  "id": "/jiliproduction/",
+  "start_url": "/jiliproduction/",
+  "scope": "/jiliproduction/",
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#1C3D2E",
