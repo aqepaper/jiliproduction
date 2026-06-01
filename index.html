@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>吉力咖啡烘焙生管系統</title>
+
+<!-- ══ PWA 共用 ══ -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1C3D2E">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- ══ iOS 專用 ══ -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="吉力生管">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-180.png">
+<link rel="apple-touch-icon" sizes="167x167" href="icons/apple-167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/apple-152.png">
+
+<!-- ══ Splash iOS（主要機型）══ -->
+<link rel="apple-touch-startup-image" href="splash/1290x2796.png"
+  media="(device-width:430px) and (device-height:932px) and (-webkit-device-pixel-ratio:3)">
+<link rel="apple-touch-startup-image" href="splash/1179x2556.png"
+  media="(device-width:393px) and (device-height:852px) and (-webkit-device-pixel-ratio:3)">
+<link rel="apple-touch-startup-image" href="splash/750x1334.png"
+  media="(device-width:375px) and (device-height:667px) and (-webkit-device-pixel-ratio:2)">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg      :#F7F5F0;
+  --bg2     :#EEEAE2;
+  --bg3     :#E4DFD4;
+  --white   :#FFFFFF;
+  --ink     :#1A1A1A;
+  --ink2    :#3D3D3D;
+  --ink3    :#7A7570;
+  --green   :#1C3D2E;
+  --green2  :#2C5C44;
+  --green-l :#E6F0EA;
+  --amber   :#B5762A;
+  --amber-l :#FDF3E3;
+  --red     :#9B2C2C;
+  --red-l   :#FDF0EF;
+  --blue-l  :#EAF0F8;
+  --blue    :#2D5FA8;
+  --border  :rgba(26,26,26,0.10);
+  --border2 :rgba(26,26,26,0.18);
+  --r       :10px;
+  --r2      :14px;
+  --max     :640px;
+  --font    :'Noto Sans TC',sans-serif;
+  --serif   :'Noto Serif TC',serif;
+  --mono    :'DM Mono',monospace;
+  --safe-b  :env(safe-area-inset-bottom,0px);
+}
+html{font-size:16px;background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{overscroll-behavior-y:contain}
+body{min-height:100dvh;padding-bottom:env(safe-area-inset-bottom,0px)}
+
+/* ── SCREENS ─────────────────────────────── */
+.screen{display:none;min-height:100dvh;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+
+/* ── HEADER ─────────────────────────────── */
+.hdr{
+  background:var(--green);
+  padding:calc(14px + env(safe-area-inset-top,0px)) 16px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.hdr-left{display:flex;align-items:center;gap:10px}
+.btn-back{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.brand{display:flex;flex-direction:column;gap:1px}
+.brand-en{font-family:var(--mono);font-size:0.6rem;letter-spacing:0.12em;color:rgba(255,255,255,0.5);text-transform:uppercase}
+.brand-zh{font-family:var(--serif);font-size:1rem;font-weight:600;color:#fff;letter-spacing:0.04em}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.3);transition:background .3s}
+.sync-dot.ok{background:#5DD48A}
+.sync-dot.busy{background:#F4C04A;animation:blink .7s infinite}
+.sync-dot.err{background:#FF6B6B}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* home screen removed */
+
+/* ── PAGE CONTENT ────────────────────────── */
+.page{max-width:var(--max);margin:0 auto;padding:16px 14px;flex:1;overflow-y:auto}
+
+/* ── TAB BAR ─────────────────────────────── */
+.tabs{background:var(--white);border-bottom:1.5px solid var(--border2);overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.tabs::-webkit-scrollbar{display:none}
+.tabs-inner{max-width:var(--max);margin:0 auto;display:flex}
+.tab{flex:1;min-width:80px;padding:12px 4px 10px;font-size:0.72rem;font-weight:500;color:var(--ink3);text-align:center;cursor:pointer;white-space:nowrap;border-bottom:2.5px solid transparent;transition:color .15s,border-color .15s;letter-spacing:0.02em}
+.tab.active{color:var(--green);border-bottom-color:var(--green);font-weight:700}
+
+/* ── VIEW ─────────────────────────────────── */
+.view{display:none;padding:16px 0 24px}
+.view.active{display:block}
+
+/* ── SECTION TITLE ──────────────────────── */
+.sec-title{font-family:var(--serif);font-size:0.95rem;font-weight:600;color:var(--green);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';width:3px;height:1em;background:var(--green);border-radius:2px;display:inline-block}
+
+/* ── FORM ─────────────────────────────────── */
+.form-block{background:var(--white);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-bottom:14px}
+.form-block-head{padding:10px 14px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:0.72rem;font-weight:700;color:var(--ink2);letter-spacing:0.04em;text-transform:uppercase}
+.form-body{padding:14px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-label{font-size:0.72rem;font-weight:700;color:var(--ink3);letter-spacing:0.05em;margin-bottom:5px;display:block;text-transform:uppercase}
+.form-input,.form-select,.form-textarea{width:100%;padding:12px 13px;border:1px solid var(--border2);border-radius:var(--r);background:var(--bg);font-family:var(--font);font-size:16px;color:var(--ink);appearance:none;-webkit-appearance:none;outline:none;transition:border-color .15s,background .15s;min-height:44px}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--green);background:var(--white)}
+.form-textarea{resize:vertical;min-height:68px;line-height:1.5}
+
+/* ── ITEMS TABLE ─────────────────────────── */
+.items-box{border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-bottom:14px;background:var(--white)}
+.item-head{display:grid;grid-template-columns:2fr 76px 68px 0px 28px;gap:4px;padding:8px 12px;background:var(--bg2);font-size:0.62rem;font-weight:700;color:var(--ink3);letter-spacing:0.04em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.item-row{display:grid;grid-template-columns:2fr 76px 68px 0px 28px;gap:4px;padding:8px 12px;border-top:1px solid var(--border);align-items:center}
+.item-row .form-select,.item-row .form-input{padding:7px 8px;font-size:0.8rem}
+.item-row .subtotal{font-family:var(--mono);font-size:0.76rem;color:var(--ink2);text-align:right;visibility:hidden;width:0;overflow:hidden}
+.btn-del-item{width:26px;height:26px;border-radius:50%;background:var(--red-l);border:none;color:var(--red);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
+.btn-add-row{width:100%;padding:10px;background:transparent;border:none;border-top:1px solid var(--border);font-size:0.82rem;color:var(--green);font-weight:600;font-family:var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
+.btn-add-row:hover{background:var(--green-l)}
+
+/* ── TOTALS ──────────────────────────────── */
+.totals-bar{display:flex;justify-content:space-between;background:var(--green-l);border:1px solid rgba(28,61,46,0.15);border-radius:var(--r);padding:12px 16px;margin-bottom:16px}
+.total-item .t-l{font-size:0.65rem;font-weight:700;color:var(--green);letter-spacing:0.05em;text-transform:uppercase;display:block;margin-bottom:2px}
+.total-item .t-v{font-family:var(--mono);font-size:1.05rem;font-weight:500;color:var(--ink)}
+
+/* ── BUTTONS ─────────────────────────────── */
+.btn{padding:13px 20px;border-radius:var(--r);font-size:0.88rem;font-weight:700;font-family:var(--font);cursor:pointer;border:none;letter-spacing:0.02em;transition:all .15s;display:inline-flex;align-items:center;gap:6px;justify-content:center;min-height:44px;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.btn-amber{background:var(--amber);color:#fff}
+.btn-ghost{background:var(--bg2);color:var(--ink);border:1px solid var(--border2)}
+.btn-ghost:hover{background:var(--bg3)}
+.btn-danger{background:var(--red-l);color:var(--red);border:1px solid rgba(155,44,44,0.2)}
+.btn-full{width:100%;margin-top:4px}
+.btn-sm{padding:7px 14px;font-size:0.76rem}
+
+/* ── ORDER CARDS ─────────────────────────── */
+.order-list{display:flex;flex-direction:column;gap:8px}
+.order-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.order-card.selected{border-color:var(--green);box-shadow:0 0 0 2px var(--green-l)}
+.order-card-head{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;user-select:none}
+.order-checkbox{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--bg);transition:all .15s}
+.order-card.selected .order-checkbox{background:var(--green);border-color:var(--green)}
+.order-checkbox svg{display:none}
+.order-card.selected .order-checkbox svg{display:block}
+.order-meta{flex:1;min-width:0}
+.order-customer{font-size:0.9rem;font-weight:700;color:var(--ink)}
+.order-id-line{font-family:var(--mono);font-size:0.62rem;color:var(--ink3);margin-top:1px}
+.order-right{text-align:right;flex-shrink:0}
+.order-amt{font-family:var(--mono);font-size:0.85rem;font-weight:500;color:var(--ink)}
+.order-qty{font-size:0.65rem;color:var(--ink3);margin-top:1px}
+.order-body{display:none;padding:10px 14px 14px;border-top:1px solid var(--border)}
+.order-card.open .order-body{display:block}
+.order-items-mini{font-size:0.78rem;color:var(--ink2);line-height:1.8;margin-bottom:10px}
+.order-note{font-size:0.75rem;color:var(--ink3);background:var(--bg2);border-radius:6px;padding:7px 10px;margin-bottom:10px;line-height:1.5}
+.order-actions{display:flex;gap:8px;justify-content:flex-end}
+
+/* ── BADGE ────────────────────────────────── */
+.badge{display:inline-block;padding:3px 9px;border-radius:100px;font-size:0.65rem;font-weight:700;letter-spacing:0.04em}
+.badge-pending{background:var(--amber-l);color:var(--amber)}
+.badge-active{background:var(--blue-l);color:var(--blue)}
+.badge-done{background:var(--green-l);color:var(--green)}
+
+/* ── SELECT BAR ──────────────────────────── */
+.select-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:10px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--r);font-size:0.82rem}
+.select-info{color:var(--ink2)}
+.select-info strong{color:var(--green);font-family:var(--mono)}
+
+/* ── SEARCH BAR ──────────────────────────── */
+.search-bar{display:flex;gap:8px;margin-bottom:12px}
+.search-input{flex:1;padding:10px 13px;border:1px solid var(--border2);border-radius:var(--r);font-size:0.85rem;font-family:var(--font);background:var(--white);color:var(--ink);outline:none}
+.search-input:focus{border-color:var(--green)}
+
+/* ── PRODUCTION NEED CARD ────────────────── */
+.need-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-bottom:10px}
+.need-card-head{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid var(--border);background:var(--bg2)}
+.need-bean-name{font-size:0.9rem;font-weight:700;color:var(--ink)}
+.need-bean-code{font-family:var(--mono);font-size:0.65rem;color:var(--ink3);margin-top:2px}
+.need-card-body{padding:14px}
+.need-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.need-col{display:flex;flex-direction:column;gap:3px;align-items:center;text-align:center}
+.need-col .n-label{font-size:0.62rem;font-weight:700;color:var(--ink3);letter-spacing:0.05em;text-transform:uppercase}
+.need-col .n-val{font-family:var(--mono);font-size:1.1rem;font-weight:500;color:var(--ink)}
+.need-col .n-unit{font-size:0.62rem;color:var(--ink3)}
+.need-col.highlight .n-val{color:var(--green);font-size:1.2rem}
+.need-col.highlight .n-label{color:var(--green)}
+.need-divider{width:1px;background:var(--border)}
+
+/* ── BATCH CARDS ─────────────────────────── */
+.batch-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-bottom:10px}
+.batch-head{padding:14px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.batch-id-text{font-family:var(--mono);font-size:0.82rem;font-weight:500;color:var(--green)}
+.batch-meta-text{font-size:0.72rem;color:var(--ink3);margin-top:3px}
+.batch-body{display:none;border-top:1px solid var(--border);padding:14px}
+.batch-card.open .batch-body{display:block}
+
+/* ── STATS TABLE ─────────────────────────── */
+.stats-table{width:100%;border-collapse:collapse;font-size:0.8rem;margin-bottom:14px}
+.stats-table th{background:var(--bg2);padding:8px 8px;text-align:left;font-size:0.62rem;font-weight:700;color:var(--ink3);letter-spacing:0.04em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.stats-table td{padding:10px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
+.stats-table tr:last-child td{border-bottom:none}
+.stats-table .num{font-family:var(--mono);text-align:right}
+.prog-select{padding:8px 10px;border-radius:var(--r);border:1px solid var(--border2);font-size:16px;font-family:var(--font);background:var(--bg);color:var(--ink);appearance:none;-webkit-appearance:none;cursor:pointer;min-height:44px}
+
+/* ── EMPTY ────────────────────────────────── */
+.empty{text-align:center;padding:48px 20px;color:var(--ink3)}
+.empty-icon{font-size:2.2rem;margin-bottom:10px;opacity:.35}
+.empty-text{font-size:0.85rem}
+
+/* ── TOAST ────────────────────────────────── */
+.toast{position:fixed;bottom:calc(24px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(12px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:var(--r);font-size:0.8rem;font-weight:500;opacity:0;transition:all .25s;pointer-events:none;z-index:300;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── MODAL ────────────────────────────────── */
+.modal-bg{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:var(--white);border-radius:var(--r2);padding:24px;width:100%;max-width:340px}
+.modal h3{font-family:var(--serif);font-size:1rem;font-weight:600;margin-bottom:8px;color:var(--ink)}
+.modal p{font-size:0.82rem;color:var(--ink3);margin-bottom:20px;line-height:1.6;white-space:pre-wrap}
+.modal-btns{display:flex;gap:10px}
+.modal-btns .btn{flex:1}
+
+/* ── HERO ────────────────────────────────── */
+.hero{
+  background:var(--green);
+  padding:calc(16px + env(safe-area-inset-top,0px)) 16px 16px;
+  position:relative;
+  flex-shrink:0;
+}
+.hero-inner{max-width:var(--max);margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hero-brand{}
+.hero-brand-en{font-family:var(--mono);font-size:0.58rem;letter-spacing:0.14em;color:rgba(255,255,255,0.45);text-transform:uppercase}
+.hero-brand-zh{font-family:var(--serif);font-size:1.05rem;font-weight:600;color:#fff;margin-top:2px}
+.hero-btns{display:flex;gap:8px;flex-shrink:0}
+.hero-btn{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:11px 16px;border-radius:var(--r);border:1.5px solid rgba(255,255,255,0.25);
+  background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);
+  cursor:pointer;font-family:var(--font);transition:all .15s;position:relative;
+  min-height:56px;min-width:64px;-webkit-tap-highlight-color:transparent;
+}
+.hero-btn:active{transform:scale(0.96)}
+.hero-btn-active{background:rgba(255,255,255,0.22);border-color:rgba(255,255,255,0.6);color:#fff}
+.hero-btn-icon{font-size:1.3rem;line-height:1}
+.hero-btn-label{font-size:0.64rem;font-weight:700;letter-spacing:0.03em;white-space:nowrap}
+.hero-badge{
+  position:absolute;top:-5px;right:-5px;
+  background:#FF6B6B;color:#fff;
+  font-family:var(--mono);font-size:0.58rem;font-weight:700;
+  padding:2px 5px;border-radius:100px;min-width:16px;text-align:center;
+}
+
+/* ── SUB HEADER ───────────────────────────── */
+.hdr-sub{
+  background:var(--white);
+  border-bottom:1.5px solid var(--border2);
+  padding:10px 16px;
+  flex-shrink:0;
+}
+.hdr-inner-sub{max-width:var(--max);margin:0 auto}
+.hdr-sub-title{font-size:0.75rem;font-weight:700;color:var(--ink3);letter-spacing:0.06em;text-transform:uppercase}
+
+
+/* ── REPORT ───────────────────────────────── */
+.report-month{font-family:var(--serif);font-size:1.1rem;font-weight:600;color:var(--green);margin:4px 0 16px}
+.report-goal-bar{background:var(--white);border:1px solid var(--border);border-radius:var(--r2);padding:16px;margin-bottom:14px}
+.report-goal-top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:10px}
+.report-goal-count{font-family:var(--mono);font-size:2.4rem;font-weight:500;color:var(--ink);line-height:1}
+.report-goal-count span{font-size:0.8rem;color:var(--ink3);font-family:var(--font);margin-left:4px}
+.report-goal-target{font-size:0.75rem;color:var(--ink3);text-align:right}
+.report-goal-target strong{color:var(--green);font-family:var(--mono)}
+.progress-track{height:12px;background:var(--bg3);border-radius:100px;overflow:hidden}
+.progress-fill{height:100%;border-radius:100px;background:var(--green);transition:width .6s cubic-bezier(.4,0,.2,1)}
+.progress-fill.over{background:var(--amber)}
+.progress-pct{font-family:var(--mono);font-size:0.72rem;color:var(--ink3);margin-top:5px;text-align:right}
+
+.report-section-title{font-size:0.75rem;font-weight:700;color:var(--ink3);letter-spacing:0.06em;text-transform:uppercase;margin:16px 0 8px;display:flex;align-items:center;gap:6px}
+.report-section-title::before{content:'';width:3px;height:1em;background:var(--green);border-radius:2px}
+
+.bean-stat-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;row-gap:5px}
+.bean-stat-row:last-child{border-bottom:none}
+.bean-stat-name{font-size:0.88rem;font-weight:700;color:var(--ink);flex:1;min-width:80px}
+.bean-stat-tags{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.bean-stat-bar{width:100%;height:5px;background:var(--bg3);border-radius:100px;margin-top:4px;overflow:hidden}
+.bean-stat-bar-fill{height:100%;background:var(--green);border-radius:100px}
+
+.report-orders-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.report-order-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--border);font-size:0.8rem}
+.report-order-row:last-child{border-bottom:none}
+.report-order-customer{font-weight:600;color:var(--ink);flex:1}
+.report-order-id{font-family:var(--mono);font-size:0.62rem;color:var(--ink3)}
+.report-order-qty{font-family:var(--mono);font-size:0.82rem;color:var(--green);font-weight:600;flex-shrink:0}
+
+/* ── LOADING ──────────────────────────────── */
+.loading-overlay{position:fixed;inset:0;z-index:400;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.loading-overlay.hidden{display:none}
+.spinner{width:36px;height:36px;border:3px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-family:var(--serif);font-size:0.9rem;color:var(--ink3)}
+
+.divider{height:1px;background:var(--border);margin:12px 0}
+
+/* ── ITEM TAGS ────────────────────────────── */
+.item-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.item-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:100px;background:var(--bg2);border:1px solid var(--border);font-size:0.72rem;color:var(--ink2);white-space:nowrap}
+.item-tag .tag-name{font-weight:500;color:var(--ink)}
+.item-tag .tag-qty{font-family:var(--mono);color:var(--green);font-weight:600}
+.item-tag .tag-unit{color:var(--ink3);font-size:0.65rem}
+.gram-note{font-size:0.68rem;color:var(--amber);background:var(--amber-l);border-radius:6px;padding:4px 10px;display:inline-block;margin-top:4px;font-family:var(--mono)}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text">連線中…</div>
+</div>
+
+
+
+<!-- ════════════════════════════════════════
+     SCREEN 1：接單管理
+════════════════════════════════════════ -->
+<div class="screen active" id="screen-order">
+  <!-- 英雄區 -->
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-brand">
+        <div class="hero-brand-en">JILI COFFEE ROASTERY</div>
+        <div class="hero-brand-zh">吉力咖啡烘焙生管系統</div>
+      </div>
+      <div class="hero-btns">
+        <button class="hero-btn hero-btn-active" id="heroBtnOrder" onclick="switchMainScreen('order')">
+          <span class="hero-btn-icon">📋</span>
+          <span class="hero-btn-label">接單</span>
+          <span class="hero-badge" id="heroBadgeOrder" style="display:none"></span>
+        </button>
+        <button class="hero-btn" id="heroBtnProd" onclick="switchMainScreen('prod')">
+          <span class="hero-btn-icon">🔥</span>
+          <span class="hero-btn-label">生產</span>
+          <span class="hero-badge" id="heroBadgeProd" style="display:none"></span>
+        </button>
+        <button class="hero-btn" id="heroBtnReport" onclick="switchMainScreen('report')">
+          <span class="hero-btn-icon">📊</span>
+          <span class="hero-btn-label">報表</span>
+        </button>
+      </div>
+    </div>
+    <div class="sync-dot" id="syncDot2" style="position:absolute;top:14px;right:16px"></div>
+  </div>
+  <header class="hdr hdr-sub" id="hdrOrder">
+    <div class="hdr-inner-sub">
+      <span class="hdr-sub-title">接單管理</span>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <div class="tabs-inner">
+      <div class="tab active" data-tab="new-order">✏️ 新增訂單</div>
+      <div class="tab" data-tab="pending-orders">📋 待排程</div>
+      <div class="tab" data-tab="all-orders">🗂 全部訂單</div>
+    </div>
+  </nav>
+
+  <div class="page" style="overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch">
+    <!-- 新增訂單 -->
+    <div class="view active" id="view-new-order">
+      <div class="sec-title">訂單資料</div>
+      <div class="form-block">
+        <div class="form-block-head">基本資料</div>
+        <div class="form-body">
+          <div class="form-row">
+            <div>
+              <label class="form-label">訂購者姓名</label>
+              <input class="form-input" id="fCustomer" placeholder="顧客姓名" autocomplete="off">
+            </div>
+            <div>
+              <label class="form-label">備註</label>
+              <input class="form-input" id="fNote" placeholder="取貨方式等">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec-title">商品明細</div>
+      <div class="items-box">
+        <div class="item-head">
+          <span>品項</span><span>單位</span><span>數量</span><span></span><span></span>
+        </div>
+        <div id="itemRows"></div>
+        <button class="btn-add-row" onclick="addItemRow()">＋ 新增品項</button>
+      </div>
+
+      <div class="totals-bar">
+        <div class="total-item">
+          <span class="t-l">總數量</span>
+          <span class="t-v" id="previewQty">0</span>
+        </div>
+        <div class="total-item" style="align-items:flex-end">
+          <span class="t-l">總金額</span>
+          <span class="t-v" id="previewAmt">$0</span>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="submitOrder()">送出訂單</button>
+    </div>
+
+    <!-- 待排程 -->
+    <div class="view" id="view-pending-orders">
+      <div class="search-bar">
+        <input class="search-input" id="orderSearch" placeholder="搜尋顧客、訂單編號…" oninput="renderPending()">
+      </div>
+      <div class="order-list" id="pendingList"></div>
+      <div class="empty" id="pendingEmpty" style="display:none">
+        <div class="empty-icon">☕</div>
+        <div class="empty-text">目前沒有待排程訂單</div>
+      </div>
+    </div>
+
+    <!-- 全部訂單 -->
+    <div class="view" id="view-all-orders">
+      <div class="search-bar">
+        <input class="search-input" id="allOrderSearch" placeholder="搜尋顧客、訂單編號…" oninput="renderAllOrders()">
+      </div>
+      <div class="order-list" id="allOrderList"></div>
+      <div class="empty" id="allOrderEmpty" style="display:none">
+        <div class="empty-icon">📦</div>
+        <div class="empty-text">尚無訂單紀錄</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SCREEN 2：生產製造
+════════════════════════════════════════ -->
+<div class="screen" id="screen-prod">
+  <!-- 英雄區（複製一份，共用樣式） -->
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-brand">
+        <div class="hero-brand-en">JILI COFFEE ROASTERY</div>
+        <div class="hero-brand-zh">吉力咖啡烘焙生管系統</div>
+      </div>
+      <div class="hero-btns">
+        <button class="hero-btn" id="heroBtnOrder2" onclick="switchMainScreen('order')">
+          <span class="hero-btn-icon">📋</span>
+          <span class="hero-btn-label">接單</span>
+          <span class="hero-badge" id="heroBadgeOrder2" style="display:none"></span>
+        </button>
+        <button class="hero-btn hero-btn-active" id="heroBtnProd2" onclick="switchMainScreen('prod')">
+          <span class="hero-btn-icon">🔥</span>
+          <span class="hero-btn-label">生產</span>
+          <span class="hero-badge" id="heroBadgeProd2" style="display:none"></span>
+        </button>
+        <button class="hero-btn" id="heroBtnReport2" onclick="switchMainScreen('report')">
+          <span class="hero-btn-icon">📊</span>
+          <span class="hero-btn-label">報表</span>
+        </button>
+      </div>
+    </div>
+    <div class="sync-dot" id="syncDot3" style="position:absolute;top:14px;right:16px"></div>
+  </div>
+  <header class="hdr hdr-sub" id="hdrProd">
+    <div class="hdr-inner-sub">
+      <span class="hdr-sub-title">生產製造</span>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <div class="tabs-inner">
+      <div class="tab active" data-tab="schedule">📋 排程選單</div>
+      <div class="tab" data-tab="active-batch">🔥 進行中批次</div>
+      <div class="tab" data-tab="history-batch">🗂 歷史批次</div>
+    </div>
+  </nav>
+
+  <div class="page" style="overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch">
+    <!-- 排程選單 -->
+    <div class="view active" id="view-schedule">
+      <div class="select-bar">
+        <span class="select-info">已選 <strong id="selectedCount">0</strong> 筆訂單</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="selectAllPending()">全選</button>
+          <button class="btn btn-amber btn-sm" onclick="openCreateBatch()">🔥 建立批次</button>
+        </div>
+      </div>
+      <div class="order-list" id="scheduleList"></div>
+      <div class="empty" id="scheduleEmpty" style="display:none">
+        <div class="empty-icon">✅</div>
+        <div class="empty-text">目前沒有待排程訂單</div>
+      </div>
+    </div>
+
+    <!-- 進行中批次 -->
+    <div class="view" id="view-active-batch">
+      <div id="activeBatchList"></div>
+      <div class="empty" id="activeBatchEmpty" style="display:none">
+        <div class="empty-icon">🏭</div>
+        <div class="empty-text">目前沒有進行中的批次</div>
+      </div>
+    </div>
+
+    <!-- 歷史批次 -->
+    <div class="view" id="view-history-batch">
+      <div id="historyBatchList"></div>
+      <div class="empty" id="historyBatchEmpty" style="display:none">
+        <div class="empty-icon">🗂</div>
+        <div class="empty-text">尚無完成的批次</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     SCREEN 3：報表
+════════════════════════════════════════ -->
+<div class="screen" id="screen-report">
+  <!-- 英雄區 -->
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-brand">
+        <div class="hero-brand-en">JILI COFFEE ROASTERY</div>
+        <div class="hero-brand-zh">吉力咖啡烘焙生管系統</div>
+      </div>
+      <div class="hero-btns">
+        <button class="hero-btn" id="heroBtnOrder3" onclick="switchMainScreen('order')">
+          <span class="hero-btn-icon">📋</span>
+          <span class="hero-btn-label">接單</span>
+          <span class="hero-badge" id="heroBadgeOrder3" style="display:none"></span>
+        </button>
+        <button class="hero-btn" id="heroBtnProd3" onclick="switchMainScreen('prod')">
+          <span class="hero-btn-icon">🔥</span>
+          <span class="hero-btn-label">生產</span>
+          <span class="hero-badge" id="heroBadgeProd3" style="display:none"></span>
+        </button>
+        <button class="hero-btn hero-btn-active" id="heroBtnReport3" onclick="switchMainScreen('report')">
+          <span class="hero-btn-icon">📊</span>
+          <span class="hero-btn-label">報表</span>
+        </button>
+      </div>
+    </div>
+    <div class="sync-dot" id="syncDot4" style="position:absolute;top:14px;right:16px"></div>
+  </div>
+  <header class="hdr hdr-sub">
+    <div class="hdr-inner-sub">
+      <span class="hdr-sub-title">當月報表</span>
+    </div>
+  </header>
+
+  <div class="page" style="overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch">
+    <div id="reportContent" style="padding-top:4px"></div>
+  </div>
+</div>
+
+<!-- MODAL：建立批次 -->
+<div class="modal-bg" id="batchModal">
+  <div class="modal">
+    <h3>建立生產批次</h3>
+    <p id="batchModalMsg"></p>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeBatchModal()">取消</button>
+      <button class="btn btn-primary" onclick="confirmCreateBatch()">確認建立</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL：刪除訂單 -->
+<div class="modal-bg" id="deleteModal">
+  <div class="modal">
+    <h3>確認刪除</h3>
+    <p id="deleteModalMsg"></p>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeDeleteModal()">取消</button>
+      <button class="btn btn-danger" onclick="confirmDeleteOrder()">刪除</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL：批次完成 -->
+<div class="modal-bg" id="completeModal">
+  <div class="modal">
+    <h3>批次完成確認</h3>
+    <p id="completeModalMsg"></p>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeCompleteModal()">取消</button>
+      <button class="btn btn-primary" onclick="confirmCompleteBatch()">確認完成</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// GAS
+// ═══════════════════════════════════════════
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxtYxLzGFkscGVJ49bBZlLw07C9tFh8VmvWRrlKfpKE12TCfd6IDlI0oaXmtpZVlThP/exec';
+const GRAM_PER_SET = 820; // 一組 = 820 公克生豆
+
+// ═══════════════════════════════════════════
+// 狀態
+// ═══════════════════════════════════════════
+let products   = JSON.parse(localStorage.getItem('jl_products')  || '[]');
+let orders     = JSON.parse(localStorage.getItem('jl_orders')    || '[]');
+let orderItems = JSON.parse(localStorage.getItem('jl_items')     || '[]');
+let batches    = JSON.parse(localStorage.getItem('jl_batches')   || '[]');
+let batchOrds  = JSON.parse(localStorage.getItem('jl_batchOrds') || '[]');
+let stats      = JSON.parse(localStorage.getItem('jl_stats')     || '[]');
+
+let selectedOrders = new Set();
+let deleteTarget   = null;
+let completeTarget = null;
+let rowCounter     = 0;
+let orderSeq       = orders.length
+  ? Math.max(0, ...orders.map(o=>parseInt((o.id||'ORD0000').replace('ORD',''))||0))
+  : 0;
+
+function saveLocal(){
+  localStorage.setItem('jl_orders',    JSON.stringify(orders));
+  localStorage.setItem('jl_items',     JSON.stringify(orderItems));
+  localStorage.setItem('jl_batches',   JSON.stringify(batches));
+  localStorage.setItem('jl_batchOrds', JSON.stringify(batchOrds));
+  localStorage.setItem('jl_stats',     JSON.stringify(stats));
+}
+
+// ═══════════════════════════════════════════
+// GAS 通訊
+// ═══════════════════════════════════════════
+function setSyncDots(state){
+  ['syncDot','syncDot2','syncDot3','syncDot4'].forEach(id=>{
+    const d=document.getElementById(id);
+    if(d) d.className='sync-dot'+(state?' '+state:'');
+  });
+}
+
+async function gasGet(params){
+  try{
+    setSyncDots('busy');
+    const r=await fetch(GAS_URL+'?'+new URLSearchParams(params));
+    const d=await r.json();
+    setSyncDots('ok');
+    return d;
+  }catch(e){ setSyncDots('err'); return null; }
+}
+
+async function gasPost(payload){
+  try{
+    setSyncDots('busy');
+    await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),mode:'no-cors'});
+    setSyncDots('ok');
+    return {ok:true};
+  }catch(e){ setSyncDots('err'); return null; }
+}
+
+// ═══════════════════════════════════════════
+// 初始化
+// ═══════════════════════════════════════════
+async function init(){
+  document.getElementById('loadingOverlay').classList.remove('hidden');
+  await gasPost({action:'init'});
+  const pd=await gasGet({action:'products'});
+  if(pd?.products?.length){ products=pd.products; localStorage.setItem('jl_products',JSON.stringify(products)); }
+  const od=await gasGet({action:'orders'});
+  if(od?.orders){ orders=od.orders; orderItems=od.items||[]; }
+  const bd=await gasGet({action:'batches'});
+  if(bd?.batches){ batches=bd.batches; batchOrds=bd.batchOrders||[]; stats=bd.stats||[]; }
+  saveLocal();
+  orderSeq=orders.length?Math.max(0,...orders.map(o=>parseInt((o.id||'').replace('ORD',''))||0)):0;
+  document.getElementById('loadingOverlay').classList.add('hidden');
+  // 預設進入接單 → 新增訂單
+  switchMainScreen('order');
+  renderAll();
+}
+
+// ═══════════════════════════════════════════
+// 畫面切換
+// ═══════════════════════════════════════════
+function goTo(screenId){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0,0);
+  renderAll();
+}
+
+function switchMainScreen(which){
+  // 全部 screen 隱藏
+  ['screen-order','screen-prod','screen-report'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.remove('active');
+  });
+  // 全部英雄按鈕還原
+  ['heroBtnOrder','heroBtnOrder2','heroBtnOrder3',
+   'heroBtnProd','heroBtnProd2','heroBtnProd3',
+   'heroBtnReport','heroBtnReport2','heroBtnReport3'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.remove('hero-btn-active');
+  });
+
+  if(which==='order'){
+    document.getElementById('screen-order').classList.add('active');
+    ['heroBtnOrder','heroBtnOrder2','heroBtnOrder3'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('hero-btn-active')});
+    // 預設新增訂單頁
+    document.getElementById('screen-order').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById('screen-order').querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.querySelector('#screen-order [data-tab="new-order"]').classList.add('active');
+    document.getElementById('view-new-order').classList.add('active');
+    if(!document.getElementById('itemRows').children.length) addItemRow();
+  } else if(which==='prod'){
+    document.getElementById('screen-prod').classList.add('active');
+    ['heroBtnProd','heroBtnProd2','heroBtnProd3'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('hero-btn-active')});
+  } else if(which==='report'){
+    document.getElementById('screen-report').classList.add('active');
+    ['heroBtnReport','heroBtnReport2','heroBtnReport3'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('hero-btn-active')});
+    renderReport();
+  }
+  window.scrollTo(0,0);
+  renderAll();
+}
+
+// Tab 切換（接單）
+document.getElementById('screen-order').querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    const id=tab.dataset.tab;
+    document.getElementById('screen-order').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById('screen-order').querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('view-'+id).classList.add('active');
+    if(id==='new-order' && !document.getElementById('itemRows').children.length) addItemRow();
+    if(id==='pending-orders') renderPending();
+    if(id==='all-orders') renderAllOrders();
+  });
+});
+
+// Tab 切換（生產）
+document.getElementById('screen-prod').querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    const id=tab.dataset.tab;
+    document.getElementById('screen-prod').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById('screen-prod').querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('view-'+id).classList.add('active');
+  });
+});
+
+// ═══════════════════════════════════════════
+// 渲染
+// ═══════════════════════════════════════════
+function renderAll(){
+  renderPending();
+  renderAllOrders();
+  renderSchedule();
+  renderBatches();
+  updateHomeBadges();
+}
+
+function updateHomeBadges(){
+  const pending=orders.filter(o=>o.status==='待排程').length;
+  const active=batches.filter(b=>b.status==='進行中').length;
+  ['heroBadgeOrder','heroBadgeOrder2','heroBadgeOrder3'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.style.display=pending?'':'none';
+    el.textContent=pending;
+  });
+  ['heroBadgeProd','heroBadgeProd2','heroBadgeProd3'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.style.display=active?'':'none';
+    el.textContent=active;
+  });
+}
+
+// ── 待排程（接單畫面）────────────────────
+function renderPending(){
+  const q=((document.getElementById('orderSearch')||{}).value||'').toLowerCase();
+  const list=orders.filter(o=>o.status==='待排程').filter(o=>!q||matchOrder(o,q));
+  renderOrderCards('pendingList','pendingEmpty',list,false,false);
+}
+
+// ── 全部訂單 ──────────────────────────────
+function renderAllOrders(){
+  const q=((document.getElementById('allOrderSearch')||{}).value||'').toLowerCase();
+  const list=[...orders].filter(o=>!q||matchOrder(o,q)).reverse();
+  renderOrderCards('allOrderList','allOrderEmpty',list,false,true);
+}
+
+// ── 排程選單（生產畫面）──────────────────
+function renderSchedule(){
+  const list=orders.filter(o=>o.status==='待排程');
+  document.getElementById('selectedCount').textContent=selectedOrders.size;
+  const el=document.getElementById('scheduleList');
+  const empty=document.getElementById('scheduleEmpty');
+  if(!list.length){ el.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  el.innerHTML=list.slice().reverse().map(o=>{
+    const its=orderItems.filter(i=>i.orderId===o.id);
+    const sel=selectedOrders.has(o.id);
+    const tags=its.map(i=>`<span class="item-tag"><span class="tag-name">${i.name}</span>&nbsp;<span class="tag-qty">${i.qty}</span><span class="tag-unit">${i.unit}</span></span>`).join('');
+    return `<div class="order-card${sel?' selected':''}" id="sc-${o.id}" style="border-radius:var(--r);overflow:hidden">
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer" onclick="toggleSelect('${o.id}')">
+        <div class="order-checkbox">
+          <svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4l3.5 3.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:0.88rem;font-weight:700;color:var(--ink)">${o.customer||'—'}</div>
+          <div style="font-family:var(--mono);font-size:0.62rem;color:var(--ink3)">${o.id} · ${fmtDate(o.createdAt)}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:var(--mono);font-size:0.82rem;font-weight:500;color:var(--green)">${o.totalQty||0} 件</div>
+        </div>
+      </div>
+      <div style="padding:0 12px 10px;display:flex;flex-wrap:wrap;gap:4px">${tags}</div>
+      ${o.note?`<div style="padding:0 12px 10px;font-size:0.72rem;color:var(--ink3)">📝 ${o.note}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderOrderCards(listId, emptyId, list, showSelect, showStatus){
+  const el=document.getElementById(listId);
+  const empty=document.getElementById(emptyId);
+  if(!list.length){ el.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  const STATUS_BADGE={
+    '待排程':'<span class="badge badge-pending">待排程</span>',
+    '生產中':'<span class="badge badge-active">生產中</span>',
+    '已完成':'<span class="badge badge-done">已完成</span>',
+  };
+  el.innerHTML=list.map(o=>{
+    const its=orderItems.filter(i=>i.orderId===o.id);
+    const summary=its.map(i=>`${i.name} × ${i.qty}${i.unit}`).join('、');
+    const canDelete=o.status==='待排程';
+    return `<div class="order-card" id="oc-${o.id}">
+      <div class="order-card-head" onclick="toggleCardOpen('oc-${o.id}')">
+        <div class="order-meta">
+          <div class="order-customer">${o.customer||'—'} ${showStatus?(STATUS_BADGE[o.status]||''):''}</div>
+          <div class="order-id-line">${o.id} · ${fmtDate(o.createdAt)}${o.batchId?' · '+o.batchId:''}</div>
+        </div>
+        <div class="order-right">
+          <div class="order-amt" style="font-size:0.88rem;color:var(--green)">${o.totalQty||0} 件</div>
+        </div>
+      </div>
+      <div class="order-body">
+        <div class="order-items-mini">${summary||'—'}</div>
+        ${o.note?`<div class="order-note">📝 ${o.note}</div>`:''}
+        ${canDelete?`<div class="order-actions"><button class="btn btn-danger btn-sm" onclick="openDeleteModal('${o.id}')">刪除</button></div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function matchOrder(o,q){ return o.id.toLowerCase().includes(q)||(o.customer||'').toLowerCase().includes(q); }
+function toggleCardOpen(id){ document.getElementById(id)?.classList.toggle('open'); }
+function toggleSelect(id){
+  if(selectedOrders.has(id)) selectedOrders.delete(id); else selectedOrders.add(id);
+  renderSchedule();
+}
+function selectAllPending(){
+  const list=orders.filter(o=>o.status==='待排程');
+  const allSel=list.every(o=>selectedOrders.has(o.id));
+  if(allSel) list.forEach(o=>selectedOrders.delete(o.id));
+  else list.forEach(o=>selectedOrders.add(o.id));
+  renderSchedule();
+}
+
+// ═══════════════════════════════════════════
+// 新增訂單
+// ═══════════════════════════════════════════
+function addItemRow(data){
+  rowCounter++;
+  const id='irow'+rowCounter;
+  const prodOpts=products.map(p=>`<option value="${p.code}" data-price="${p.price}" ${data&&data.code===p.code?'selected':''}>${p.code} ${p.name}</option>`).join('');
+  const div=document.createElement('div');
+  div.className='item-row'; div.id=id;
+  div.innerHTML=`
+    <select class="form-select" onchange="calcTotals()">
+      <option value="">選擇品項</option>${prodOpts}
+    </select>
+    <select class="form-select" id="${id}-unit">
+      <option value="組"${data&&data.unit==='組'?' selected':''}>組</option>
+      <option value="公斤"${data&&data.unit==='公斤'?' selected':''}>公斤</option>
+    </select>
+    <input class="form-input" type="number" min="0" id="${id}-qty" value="${data?data.qty:''}" placeholder="0" oninput="calcTotals()">
+    <div class="subtotal" id="${id}-sub">$0</div>
+    <button class="btn-del-item" onclick="removeItemRow('${id}')">−</button>`;
+  document.getElementById('itemRows').appendChild(div);
+  if(data) calcTotals();
+}
+
+function removeItemRow(id){
+  if(document.querySelectorAll('.item-row').length<=1){ toast('至少需要一個品項'); return; }
+  document.getElementById(id)?.remove(); calcTotals();
+}
+
+function calcTotals(){
+  let qty=0,amt=0;
+  document.querySelectorAll('.item-row').forEach(row=>{
+    const sel=row.querySelector('select');
+    const opt=sel.options[sel.selectedIndex];
+    const price=parseFloat(opt?.dataset?.price)||0;
+    const q=parseFloat(row.querySelector('input[type="number"]')?.value)||0;
+    const sub=q*price;
+    const subEl=row.querySelector('.subtotal');
+    if(subEl) subEl.textContent='$'+sub.toLocaleString();
+    qty+=q; amt+=sub;
+  });
+  document.getElementById('previewQty').textContent=qty;
+  document.getElementById('previewAmt').textContent='$'+amt.toLocaleString();
+}
+
+function getItemRows(){
+  return Array.from(document.querySelectorAll('.item-row')).map(row=>{
+    const sel=row.querySelector('select');
+    const opt=sel.options[sel.selectedIndex];
+    const unitSel=row.querySelectorAll('select')[1];
+    return {
+      code:sel.value,
+      name:opt?opt.text.replace(sel.value+' ','').trim():'',
+      unit:unitSel?.value||'組',
+      qty:parseFloat(row.querySelector('input[type="number"]')?.value)||0,
+      price:parseFloat(opt?.dataset?.price)||0,
+    };
+  }).filter(i=>i.code&&i.qty>0);
+}
+
+async function submitOrder(){
+  const customer=document.getElementById('fCustomer').value.trim();
+  if(!customer){ toast('請填寫訂購者姓名'); return; }
+  const its=getItemRows();
+  if(!its.length){ toast('請至少新增一項品項'); return; }
+  orderSeq++;
+  const id='ORD'+String(orderSeq).padStart(4,'0');
+  const totalQty=its.reduce((s,i)=>s+i.qty,0);
+  const totalAmt=its.reduce((s,i)=>s+i.qty*i.price,0);
+  const note=document.getElementById('fNote').value.trim();
+  const now=new Date().toISOString();
+  const newOrder={id,createdAt:now,customer,note,totalQty,totalAmt,status:'待排程',batchId:''};
+  orders.push(newOrder);
+  its.forEach(i=>orderItems.push({...i,orderId:id}));
+  saveLocal(); renderAll();
+  document.getElementById('fCustomer').value='';
+  document.getElementById('fNote').value='';
+  document.getElementById('itemRows').innerHTML='';
+  rowCounter=0; addItemRow(); calcTotals();
+  toast('訂單 '+id+' 已建立 ✓');
+  gasPost({action:'createOrder',order:{id,customer,note,totalQty,totalAmt,items:its}});
+}
+
+// ═══════════════════════════════════════════
+// 刪除訂單
+// ═══════════════════════════════════════════
+function openDeleteModal(id){
+  deleteTarget=id;
+  const o=orders.find(x=>x.id===id);
+  document.getElementById('deleteModalMsg').textContent=`確定要刪除 ${id}（${o?o.customer:''}）？`;
+  document.getElementById('deleteModal').classList.add('open');
+}
+function closeDeleteModal(){ document.getElementById('deleteModal').classList.remove('open'); deleteTarget=null; }
+async function confirmDeleteOrder(){
+  if(!deleteTarget) return;
+  const id=deleteTarget;
+  orders=orders.filter(o=>o.id!==id);
+  orderItems=orderItems.filter(i=>i.orderId!==id);
+  selectedOrders.delete(id);
+  saveLocal(); renderAll(); closeDeleteModal(); toast('已刪除 '+id);
+  gasPost({action:'deleteOrder',orderId:id});
+}
+
+// ═══════════════════════════════════════════
+// 建立批次
+// ═══════════════════════════════════════════
+function openCreateBatch(){
+  if(!selectedOrders.size){ toast('請先勾選要納入的訂單'); return; }
+  const ids=[...selectedOrders];
+  const names=ids.map(id=>{ const o=orders.find(x=>x.id===id); return o?o.customer:id; });
+  // 預覽生豆需求
+  const preview=calcNeedMap(ids);
+  const previewLines=Object.entries(preview).map(([code,s])=>{
+    const totalG=s.setQty*GRAM_PER_SET + s.kgQty*1000;
+    return `${s.name}：${totalG.toLocaleString()} 公克`;
+  }).join('\n');
+  document.getElementById('batchModalMsg').textContent=
+    `選取 ${ids.length} 筆訂單（${names.join('、')}）\n\n生豆需求預覽：\n${previewLines||'（無品項）'}`;
+  document.getElementById('batchModal').classList.add('open');
+}
+function closeBatchModal(){ document.getElementById('batchModal').classList.remove('open'); }
+
+async function confirmCreateBatch(){
+  closeBatchModal();
+  const ids=[...selectedOrders];
+  const today=new Date();
+  const ymd=today.toISOString().slice(0,10).replace(/-/g,'');
+  const prefix='B'+ymd+'-';
+  const existing=batches.filter(b=>b.id.startsWith(prefix));
+  const seq=String(existing.length+1).padStart(3,'0');
+  const batchId=prefix+seq;
+  const now=today.toISOString();
+  batches.push({id:batchId,createdAt:now,orderCount:ids.length,status:'進行中',completedAt:''});
+  ids.forEach(oid=>batchOrds.push({batchId,orderId:oid}));
+  orders=orders.map(o=>ids.includes(o.id)?{...o,status:'生產中',batchId}:o);
+  // 統計
+  const needMap=calcNeedMap(ids);
+  Object.entries(needMap).forEach(([code,s])=>{
+    stats.push({batchId,code,name:s.name,pkgQty:s.setQty,kgQty:s.kgQty,status:'待烘焙'});
+  });
+  selectedOrders.clear();
+  saveLocal(); renderAll();
+  toast('批次 '+batchId+' 已建立');
+  // 切到進行中
+  document.getElementById('screen-prod').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('screen-prod').querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelector('[data-tab="active-batch"]').classList.add('active');
+  document.getElementById('view-active-batch').classList.add('active');
+  gasPost({action:'createBatch',orderIds:ids});
+}
+
+// ── 計算各豆款組數+公斤數 ─────────────────
+function calcNeedMap(orderIds){
+  const map={};
+  orderItems.filter(i=>orderIds.includes(i.orderId)).forEach(i=>{
+    if(!i.code||!i.qty) return;
+    if(!map[i.code]) map[i.code]={name:i.name,setQty:0,kgQty:0};
+    if(i.unit==='公斤') map[i.code].kgQty+=i.qty;
+    else map[i.code].setQty+=i.qty;
+  });
+  return map;
+}
+
+// ═══════════════════════════════════════════
+// 批次渲染
+// ═══════════════════════════════════════════
+const STATUS_ROAST=['待烘焙','完成烘焙'];
+
+function renderBatches(){
+  const active=batches.filter(b=>b.status==='進行中');
+  const history=batches.filter(b=>b.status==='已完成');
+  renderBatchList('activeBatchList','activeBatchEmpty',active,true);
+  renderBatchList('historyBatchList','historyBatchEmpty',history,false);
+}
+
+function renderBatchList(listId,emptyId,list,showActions){
+  const el=document.getElementById(listId);
+  const empty=document.getElementById(emptyId);
+  if(!list.length){ el.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  el.innerHTML=list.slice().reverse().map(b=>{
+    const bStats=stats.filter(s=>s.batchId===b.id);
+    const bOids=batchOrds.filter(x=>x.batchId===b.id).map(x=>x.orderId);
+    const badgeCls=b.status==='已完成'?'badge-done':'badge-active';
+
+    // 生豆需求 橫列版
+    const needCards='<div style="margin-bottom:12px">'+bStats.map(s=>{
+      const totalG=s.pkgQty*GRAM_PER_SET + s.kgQty*1000;
+      const progOpts=STATUS_ROAST.map(st=>`<option${st===s.status?' selected':''}>${st}</option>`).join('');
+      const roastIdx=STATUS_ROAST.indexOf(s.status);
+      const roastColors=['#D04A1A','var(--green)'];
+      const roastColor=roastColors[roastIdx>=0?roastIdx:0];
+      const formula=[]
+      if(s.pkgQty) formula.push(s.pkgQty+'×'+GRAM_PER_SET+'g');
+      if(s.kgQty)  formula.push(s.kgQty+'kg×1000g');
+      return `<div style="display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;row-gap:5px">
+        <span style="font-size:0.85rem;font-weight:700;color:var(--ink);min-width:80px;flex-shrink:0">${s.name}</span>
+        ${s.pkgQty?`<span class="item-tag"><span class="tag-qty">${s.pkgQty}</span><span class="tag-unit">組</span></span>`:''}
+        ${s.kgQty?`<span class="item-tag"><span class="tag-qty">${s.kgQty}</span><span class="tag-unit">kg</span></span>`:''}
+        <span class="item-tag" style="background:var(--green-l);border-color:rgba(28,61,46,0.2);gap:3px">
+          <span style="font-size:0.65rem;color:var(--green)">⚖</span>
+          <span style="font-family:var(--mono);font-weight:700;color:var(--green);font-size:0.85rem">${totalG.toLocaleString()}</span>
+          <span style="font-size:0.65rem;color:var(--green)">g</span>
+        </span>
+        <span style="font-family:var(--mono);font-size:0.62rem;color:var(--ink3)">${formula.join('+')}</span>
+        <span style="margin-left:auto">
+          ${showActions
+            ? `<select class="prog-select" onchange="updateStatLocal('${b.id}','${s.code}',this.value)" style="color:${roastColor};font-weight:600">${progOpts}</select>`
+            : `<span class="badge" style="background:${roastColor}22;color:${roastColor}">${s.status}</span>`}
+        </span>
+      </div>`;
+    }).join('')+'</div>';
+
+    const orderSummary=bOids.map(oid=>{
+      const o=orders.find(x=>x.id===oid);
+      return o?`<span style="font-size:0.76rem;color:var(--ink2);margin-right:10px;display:inline-block">${o.customer}（${o.id}）</span>`:'';
+    }).join('');
+
+    return `<div class="batch-card open" id="bcard-${b.id}">
+      <div class="batch-head">
+        <div>
+          <div class="batch-id-text">${b.id}</div>
+          <div class="batch-meta-text">${fmtDate(b.createdAt)} · ${b.orderCount}筆訂單</div>
+        </div>
+        <span class="badge ${badgeCls}">${b.status}</span>
+      </div>
+      <div class="batch-body" style="display:block">
+        <div style="margin-bottom:12px;line-height:2">${orderSummary}</div>
+        ${needCards}
+        ${showActions?`<button class="btn btn-primary btn-sm" style="width:100%" onclick="openCompleteModal('${b.id}')">✓ 批次完成</button>`:''}
+        ${b.completedAt?`<div style="font-size:0.7rem;color:var(--ink3);margin-top:8px;text-align:right">完成：${fmtDate(b.completedAt)}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateStatLocal(batchId,code,status){
+  const idx=stats.findIndex(s=>s.batchId===batchId&&s.code===code);
+  if(idx>=0) stats[idx].status=status;
+  saveLocal(); renderBatches();
+  toast('進度已更新：'+status);
+  gasPost({action:'updateStat',batchId,code,status});
+}
+
+// ═══════════════════════════════════════════
+// 批次完成
+// ═══════════════════════════════════════════
+function openCompleteModal(batchId){
+  completeTarget=batchId;
+  document.getElementById('completeModalMsg').textContent=
+    `確認批次 ${batchId} 全部完成？\n相關訂單將標記為「已完成」。`;
+  document.getElementById('completeModal').classList.add('open');
+}
+function closeCompleteModal(){ document.getElementById('completeModal').classList.remove('open'); completeTarget=null; }
+async function confirmCompleteBatch(){
+  if(!completeTarget) return;
+  const bid=completeTarget;
+  const now=new Date().toISOString();
+  batches=batches.map(b=>b.id===bid?{...b,status:'已完成',completedAt:now}:b);
+  const oids=batchOrds.filter(x=>x.batchId===bid).map(x=>x.orderId);
+  orders=orders.map(o=>oids.includes(o.id)?{...o,status:'已完成'}:o);
+  saveLocal(); renderAll(); closeCompleteModal();
+  toast('批次 '+bid+' 已完成 ✓');
+  gasPost({action:'completeBatch',batchId:bid});
+}
+
+// ═══════════════════════════════════════════
+// 工具
+// ═══════════════════════════════════════════
+function toast(msg,dur=2600){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),dur);
+}
+// ═══════════════════════════════════════════
+// 報表
+// ═══════════════════════════════════════════
+const MONTHLY_GOAL = 200;
+
+function renderReport(){
+  const now   = new Date();
+  const year  = now.getFullYear();
+  const month = now.getMonth(); // 0-indexed
+
+  // 當月已完成訂單（狀態=已完成，且建立於本月）
+  const monthOrders = orders.filter(o=>{
+    if(o.status!=='已完成') return false;
+    const d = new Date(o.createdAt);
+    return d.getFullYear()===year && d.getMonth()===month;
+  });
+
+  // 總次數（每組或每公斤算1次）
+  const monthItems = orderItems.filter(i=>monthOrders.some(o=>o.id===i.orderId));
+  const totalCount = monthItems.reduce((s,i)=>s+(i.qty||0), 0);
+  const pct        = Math.min(Math.round(totalCount/MONTHLY_GOAL*100), 100);
+  const isOver     = totalCount > MONTHLY_GOAL;
+
+  // 分項統計（各豆款）
+  const beanMap = {};
+  monthItems.forEach(i=>{
+    if(!i.code) return;
+    if(!beanMap[i.code]) beanMap[i.code]={name:i.name,setQty:0,kgQty:0,total:0};
+    if(i.unit==='公斤') beanMap[i.code].kgQty+=i.qty;
+    else beanMap[i.code].setQty+=i.qty;
+    beanMap[i.code].total+=i.qty;
+  });
+  const beanList=Object.values(beanMap).sort((a,b)=>b.total-a.total);
+  const maxBean=beanList.length?beanList[0].total:1;
+
+  const monthLabel=`${year} 年 ${month+1} 月`;
+
+  const beanRows=beanList.map(b=>{
+    const barW=Math.round(b.total/maxBean*100);
+    return `<div class="bean-stat-row">
+      <div style="width:100%">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+          <span class="bean-stat-name">${b.name}</span>
+          <div class="bean-stat-tags">
+            ${b.setQty?`<span class="item-tag"><span class="tag-qty">${b.setQty}</span><span class="tag-unit">組</span></span>`:''}
+            ${b.kgQty?`<span class="item-tag"><span class="tag-qty">${b.kgQty}</span><span class="tag-unit">kg</span></span>`:''}
+            <span class="item-tag" style="background:var(--green-l);border-color:rgba(28,61,46,0.2)">
+              <span style="font-family:var(--mono);font-weight:700;color:var(--green)">${b.total}</span>
+              <span style="font-size:0.62rem;color:var(--green)">次</span>
+            </span>
+          </div>
+        </div>
+        <div class="bean-stat-bar"><div class="bean-stat-bar-fill" style="width:${barW}%"></div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const orderRows=monthOrders.slice().reverse().map(o=>{
+    const cnt=orderItems.filter(i=>i.orderId===o.id).reduce((s,i)=>s+(i.qty||0),0);
+    return `<div class="report-order-row">
+      <div>
+        <div class="report-order-customer">${o.customer||'—'}</div>
+        <div class="report-order-id">${o.id} · ${fmtDate(o.createdAt)}</div>
+      </div>
+      <span class="report-order-qty">${cnt} 次</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('reportContent').innerHTML=`
+    <div class="report-month">${monthLabel}</div>
+
+    <div class="report-goal-bar">
+      <div class="report-goal-top">
+        <div>
+          <div class="report-goal-count">${totalCount}<span>次</span></div>
+          <div style="font-size:0.72rem;color:var(--ink3);margin-top:3px">當月累計完成數量</div>
+        </div>
+        <div class="report-goal-target">
+          目標<br><strong>${MONTHLY_GOAL}</strong> 次
+        </div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill${isOver?' over':''}" style="width:${pct}%"></div>
+      </div>
+      <div class="progress-pct">${pct}%${isOver?' · 🎉 已達標！':''}</div>
+    </div>
+
+    ${beanList.length?`
+    <div class="report-section-title">分項統計</div>
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r2);padding:4px 14px 4px;margin-bottom:14px">
+      ${beanRows}
+    </div>`:''}
+
+    ${monthOrders.length?`
+    <div class="report-section-title">當月完成訂單</div>
+    <div class="report-orders-wrap">${orderRows}</div>`
+    :`<div class="empty"><div class="empty-icon">📊</div><div class="empty-text">本月尚無完成的訂單</div></div>`}
+  `;
+}
+
+function fmtDate(str){
+  if(!str) return '';
+  const d=new Date(str); if(isNaN(d)) return str.slice(0,10)||str;
+  return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+init();
+</script>
+
+<!-- ══ PWA：Service Worker 註冊 + 安裝提示 ══ -->
+<div id="installBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:500;
+  background:var(--green);color:#fff;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));
+  display:none;align-items:center;justify-content:space-between;gap:12px;font-size:0.82rem">
+  <span>📲 加入主畫面，隨時快速開啟</span>
+  <div style="display:flex;gap:8px;flex-shrink:0">
+    <button onclick="installApp()" style="padding:7px 14px;background:#fff;color:var(--green);border:none;border-radius:6px;font-weight:700;font-family:var(--font);font-size:0.78rem;cursor:pointer">安裝</button>
+    <button onclick="document.getElementById('installBanner').style.display='none'" style="padding:7px 10px;background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:6px;font-size:0.78rem;cursor:pointer">✕</button>
+  </div>
+</div>
+
+<script>
+// Service Worker
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg=>console.log('[SW] 已註冊:', reg.scope))
+      .catch(err=>console.warn('[SW] 註冊失敗:', err));
+  });
+}
+
+// Android 安裝提示
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault();
+  deferredPrompt = e;
+  const banner = document.getElementById('installBanner');
+  if(banner) banner.style.display='flex';
+});
+function installApp(){
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(()=>{
+    deferredPrompt=null;
+    const banner=document.getElementById('installBanner');
+    if(banner) banner.style.display='none';
+  });
+}
+window.addEventListener('appinstalled', ()=>{
+  const banner=document.getElementById('installBanner');
+  if(banner) banner.style.display='none';
+  deferredPrompt=null;
+});
+</script>
+</body>
+</html>
