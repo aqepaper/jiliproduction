@@ -336,7 +336,7 @@ body{min-height:100dvh;padding-bottom:env(safe-area-inset-bottom,0px)}
     <div class="hero-inner">
       <div class="hero-brand">
         <div class="hero-brand-en">JILI COFFEE ROASTERY</div>
-        <div class="hero-brand-zh">吉力咖啡烘焙生管系統</div>
+        <div class="hero-brand-zh">吉力咖啡烘焙生管系統 <span style="font-size:12px;opacity:0.6;font-weight:400;">v1.2</span></div>
       </div>
       <div class="hero-btns">
         <button class="hero-btn hero-btn-active" id="heroBtnOrder" onclick="switchMainScreen('order')">
@@ -448,7 +448,7 @@ body{min-height:100dvh;padding-bottom:env(safe-area-inset-bottom,0px)}
     <div class="hero-inner">
       <div class="hero-brand">
         <div class="hero-brand-en">JILI COFFEE ROASTERY</div>
-        <div class="hero-brand-zh">吉力咖啡烘焙生管系統</div>
+        <div class="hero-brand-zh">吉力咖啡烘焙生管系統 <span style="font-size:12px;opacity:0.6;font-weight:400;">v1.2</span></div>
       </div>
       <div class="hero-btns">
         <button class="hero-btn" id="heroBtnOrder2" onclick="switchMainScreen('order')">
@@ -530,7 +530,7 @@ body{min-height:100dvh;padding-bottom:env(safe-area-inset-bottom,0px)}
     <div class="hero-inner">
       <div class="hero-brand">
         <div class="hero-brand-en">JILI COFFEE ROASTERY</div>
-        <div class="hero-brand-zh">吉力咖啡烘焙生管系統</div>
+        <div class="hero-brand-zh">吉力咖啡烘焙生管系統 <span style="font-size:12px;opacity:0.6;font-weight:400;">v1.2</span></div>
       </div>
       <div class="hero-btns">
         <button class="hero-btn" id="heroBtnOrder3" onclick="switchMainScreen('order')">
@@ -888,6 +888,7 @@ function addItemRow(data){
     <select class="form-select" id="${id}-unit">
       <option value="組"${data&&data.unit==='組'?' selected':''}>組</option>
       <option value="公斤"${data&&data.unit==='公斤'?' selected':''}>公斤</option>
+      <option value="磅"${data&&data.unit==='磅'?' selected':''}>磅</option>
     </select>
     <input class="form-input" type="number" min="0" id="${id}-qty" value="${data?data.qty:''}" placeholder="0" oninput="calcTotals()">
     <div class="subtotal" id="${id}-sub">$0</div>
